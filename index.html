@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Steering Visualizer</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body,html{height:100%;margin:0;overflow:hidden;font-family:Arial}
+      #canvas-container{position:absolute;left:0;top:0;right:40%;bottom:0;background:#0b0b0b}
+      #ui-panel{position:absolute;right:0;top:0;bottom:0;width:40%;overflow:auto;background:#fff;padding:12px;box-sizing:border-box}
+      canvas{display:block}
+      .chart{width:100%;height:200px;margin-bottom:12px}
+      .control-row{margin-bottom:8px}
+      #wheel-label{
+        position:absolute;
+        padding:8px 10px;
+        background:rgba(20,20,20,0.9);
+        color:#fff;
+        border-radius:6px;
+        pointer-events:none;
+        display:none;
+        font-size:14px;
+      }
+      #export-csv { margin-left:8px }
+    </style>
+  </head>
+  <body>
+    <div id="canvas-container"></div>
+
+    <div id="ui-panel">
+      <h2>Steering & Tire Pressure Visualizer</h2>
+
+      <div id="controls"></div>
+      <hr/>
+      <div style="margin-bottom:8px">
+        <button id="run-sweep">Run Pressure Sweep & Generate Plots</button>
+        <button id="export-csv">Export Sweep CSV</button>
+      </div>
+
+      <h3>Live plots</h3>
+      <canvas id="plot-delta-yaw" class="chart"></canvas>
+      <canvas id="plot-alpha-fy" class="chart"></canvas>
+      <canvas id="plot-time" class="chart"></canvas>
+
+      <h3>Sweep / Summary plots</h3>
+      <canvas id="plot-pressure-calpha" class="chart"></canvas>
+      <canvas id="plot-pressure-yawgain" class="chart"></canvas>
+
+      <h3>Extra plots</h3>
+      <canvas id="plot-mz-alpha" class="chart"></canvas>
+      <canvas id="plot-ay-delta" class="chart"></canvas>
+      <canvas id="plot-understeer" class="chart"></canvas>
+    </div>
+
+    <div id="wheel-label"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
