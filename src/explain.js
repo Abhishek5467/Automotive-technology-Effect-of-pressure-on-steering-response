@@ -186,17 +186,14 @@ This helps parameter identification and intuition.`,
   // ------------------------------------------------------
   (function makePanelDraggable() {
     const panel = document.getElementById("explain-panel");
-    const card = document.getElementById("explain-card");
 
-    let isDragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
+    const header = document.getElementById("explain-header");
 
-    card.style.cursor = "grab";
+    header.style.cursor = "grab";
 
-    card.addEventListener("mousedown", (e) => {
+    header.addEventListener("mousedown", (e) => {
       isDragging = true;
-      card.style.cursor = "grabbing";
+      header.style.cursor = "grabbing";
 
       const rect = panel.getBoundingClientRect();
       offsetX = e.clientX - rect.left;
