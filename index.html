@@ -4,14 +4,15 @@
     <meta charset="utf-8" />
     <title>Steering Visualizer</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+
     <style>
-      body,
-      html {
+      body, html {
         height: 100%;
         margin: 0;
         overflow: hidden;
         font-family: Arial;
       }
+
       #canvas-container {
         position: absolute;
         left: 0;
@@ -20,6 +21,7 @@
         bottom: 0;
         background: #0b0b0b;
       }
+
       #ui-panel {
         position: absolute;
         right: 0;
@@ -31,17 +33,17 @@
         padding: 12px;
         box-sizing: border-box;
       }
+
       canvas {
         display: block;
       }
+
       .chart {
         width: 100%;
         height: 200px;
         margin-bottom: 12px;
       }
-      .control-row {
-        margin-bottom: 8px;
-      }
+
       #wheel-label {
         position: absolute;
         padding: 8px 10px;
@@ -52,19 +54,39 @@
         display: none;
         font-size: 14px;
       }
-      #export-csv {
-        margin-left: 8px;
+
+      /* cursor for typing effect */
+      #explain-text .cursor {
+        display: inline-block;
+        width: 8px;
+        background: #111;
+        margin-left: 6px;
+        animation: blink 1s steps(2, start) infinite;
+        vertical-align: middle;
+        height: 1em;
+      }
+
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+
+      /* ensure sliders always receive pointer events */
+      input[type="range"] {
+        pointer-events: auto !important;
       }
     </style>
   </head>
+
   <body>
     <div id="canvas-container"></div>
 
+    <!-- UI PANEL -->
     <div id="ui-panel">
       <h2>Steering & Tire Pressure Visualizer</h2>
 
       <div id="controls"></div>
       <hr />
+
       <div style="margin-bottom: 8px">
         <button id="run-sweep">Run Pressure Sweep & Generate Plots</button>
         <button id="export-csv">Export Sweep CSV</button>
@@ -84,17 +106,18 @@
       <canvas id="plot-ay-delta" class="chart"></canvas>
       <canvas id="plot-understeer" class="chart"></canvas>
     </div>
-    <!-- Add just below the UI panel or near top of body -->
+
+    <!-- EXPLANATION PANEL (DRAGGABLE) -->
     <div
       id="explain-panel"
       style="
         position: fixed;
-        left: 42%;
-        top: 8px;
-        width: 55%;
+        left: 45%;
+        top: 10px;
+        width: 50%;
         max-width: 780px;
         pointer-events: auto;
-        z-index: 40;
+        z-index: 1000;
       "
     >
       <div
@@ -105,15 +128,19 @@
           padding: 12px;
           color: #111;
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-          pointer-events: none;
+          pointer-events: auto;
+          user-select: none;
         "
       >
+        <!-- DRAG HEADER -->
         <div
+          id="explain-header"
           style="
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+            cursor: move;
           "
         >
           <strong>Magic Formula — Interactive Explanation</strong>
@@ -123,6 +150,7 @@
           </div>
         </div>
 
+        <!-- TYPING AREA -->
         <div
           id="explain-text"
           style="
@@ -130,73 +158,34 @@
             font-family: monospace;
             white-space: pre-wrap;
             line-height: 1.4;
+            pointer-events: auto;
           "
         ></div>
 
-        <div
-          style="margin-top: 10px; display: flex; gap: 8px; align-items: center"
-        >
+        <!-- SLIDERS -->
+        <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center">
           <div style="flex: 1">
-            <label style="display: block; font-size: 12px; margin-bottom: 4px"
-              >B (stiffness)</label
-            >
-            <input
-              id="slider-B"
-              type="range"
-              min="1"
-              max="200"
-              step="1"
-              value="40"
-              style="width: 100%"
-            />
+            <label>B (stiffness)</label>
+            <input id="slider-B" type="range" min="1" max="200" step="1" value="40" />
           </div>
+
           <div style="flex: 1">
-            <label style="display: block; font-size: 12px; margin-bottom: 4px"
-              >C (shape)</label
-            >
-            <input
-              id="slider-C"
-              type="range"
-              min="0.5"
-              max="2.5"
-              step="0.01"
-              value="1.2"
-              style="width: 100%"
-            />
+            <label>C (shape)</label>
+            <input id="slider-C" type="range" min="0.5" max="2.5" step="0.01" value="1.2" />
           </div>
+
           <div style="flex: 1">
-            <label style="display: block; font-size: 12px; margin-bottom: 4px"
-              >D (peak)</label
-            >
-            <input
-              id="slider-D"
-              type="range"
-              min="0"
-              max="20000"
-              step="10"
-              value="9000"
-              style="width: 100%"
-            />
+            <label>D (peak)</label>
+            <input id="slider-D" type="range" min="0" max="20000" step="10" value="9000" />
           </div>
+
           <div style="flex: 1">
-            <label style="display: block; font-size: 12px; margin-bottom: 4px"
-              >E (curvature)</label
-            >
-            <input
-              id="slider-E"
-              type="range"
-              min="-1"
-              max="1"
-              step="0.01"
-              value="0.2"
-              style="width: 100%"
-            />
+            <label>E (curvature)</label>
+            <input id="slider-E" type="range" min="-1" max="1" step="0.01" value="0.2" />
           </div>
         </div>
 
-        <div
-          style="display: flex; gap: 8px; margin-top: 10px; align-items: center"
-        >
+        <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center">
           <button id="explain-playpause">Pause typing</button>
           <button id="explain-highlight">Toggle Plot Highlights</button>
           <div style="margin-left: auto; font-size: 12px; color: #666">
@@ -206,26 +195,38 @@
       </div>
     </div>
 
-    <!-- small cursor style for typing effect -->
-    <style>
-      #explain-text .cursor {
-        display: inline-block;
-        width: 8px;
-        background: #111;
-        margin-left: 6px;
-        animation: blink 1s steps(2, start) infinite;
-        vertical-align: middle;
-        height: 1em;
-      }
-      @keyframes blink {
-        50% {
-          opacity: 0;
-        }
-      }
-    </style>
-
     <div id="wheel-label"></div>
 
     <script type="module" src="/src/main.js"></script>
+
+    <!-- DRAG LOGIC -->
+    <script>
+      // Draggable explanation panel
+      (function () {
+        const panel = document.getElementById("explain-panel");
+        const header = document.getElementById("explain-header");
+
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        header.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          const rect = panel.getBoundingClientRect();
+          offsetX = e.clientX - rect.left;
+          offsetY = e.clientY - rect.top;
+        });
+
+        window.addEventListener("mousemove", (e) => {
+          if (!isDragging) return;
+          panel.style.left = e.clientX - offsetX + "px";
+          panel.style.top = e.clientY - offsetY + "px";
+        });
+
+        window.addEventListener("mouseup", () => {
+          isDragging = false;
+        });
+      })();
+    </script>
   </body>
 </html>
